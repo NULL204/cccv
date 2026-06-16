@@ -68,15 +68,15 @@ class RIFEModel(VFIBaseModel):
 
         # b, n, c, h, w
         img_tensor_stack = torch.stack(new_img_list, dim=1)
-        if self.fp16:
-            img_tensor_stack = img_tensor_stack.half()
+        if self.fp16 or self.bf16:
+            img_tensor_stack = img_tensor_stack.to(self.half_dtype)
 
         out = self.inference(img_tensor_stack, timestep=0.5, scale=1.0)
 
         # Convert to numpy image list
         results_list = []
 
-        img = out.squeeze(0).permute(1, 2, 0).cpu().numpy()
+        img = out.squeeze(0).permute(1, 2, 0).float().cpu().numpy()
         img = (img * 255).clip(0, 255).astype("uint8")
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
 

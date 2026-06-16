@@ -16,6 +16,7 @@ class AutoModel:
         *,
         device: Optional[torch.device] = None,
         fp16: bool = True,
+        bf16: bool = False,
         compile: bool = False,
         compile_backend: Optional[str] = None,
         tile: Optional[Tuple[int, int]] = (128, 128),
@@ -30,7 +31,8 @@ class AutoModel:
 
         :param pretrained_model_name_or_path:
         :param device: inference device
-        :param fp16: use fp16 precision or not
+        :param fp16: use fp16 (half) precision or not
+        :param bf16: use bf16 (bfloat16) precision or not, takes precedence over fp16
         :param compile: use torch.compile or not
         :param compile_backend: backend of torch.compile
         :param tile: tile size for tile inference, tile[0] is width, tile[1] is height, None for disable
@@ -46,6 +48,7 @@ class AutoModel:
             config=config,
             device=device,
             fp16=fp16,
+            bf16=bf16,
             compile=compile,
             compile_backend=compile_backend,
             tile=tile,
@@ -62,6 +65,7 @@ class AutoModel:
         *,
         device: Optional[torch.device] = None,
         fp16: bool = True,
+        bf16: bool = False,
         compile: bool = False,
         compile_backend: Optional[str] = None,
         tile: Optional[Tuple[int, int]] = (128, 128),
@@ -76,7 +80,8 @@ class AutoModel:
 
         :param config: The config object. We suggest use cccv.BaseConfig or its subclass.
         :param device: inference device
-        :param fp16: use fp16 precision or not
+        :param fp16: use fp16 (half) precision or not
+        :param bf16: use bf16 (bfloat16) precision or not, takes precedence over fp16
         :param compile: use torch.compile or not
         :param compile_backend: backend of torch.compile
         :param tile: tile size for tile inference, tile[0] is width, tile[1] is height, None for disable
@@ -91,6 +96,7 @@ class AutoModel:
             config=config,
             device=device,
             fp16=fp16,
+            bf16=bf16,
             compile=compile,
             compile_backend=compile_backend,
             tile=tile,

@@ -86,15 +86,15 @@ class DRBAModel(VFIBaseModel):
 
         # b, n, c, h, w
         img_tensor_stack = torch.stack(new_img_list, dim=1)
-        if self.fp16:
-            img_tensor_stack = img_tensor_stack.half()
+        if self.fp16 or self.bf16:
+            img_tensor_stack = img_tensor_stack.to(self.half_dtype)
 
         results, _ = self.inference(img_tensor_stack, [-1, -0.5], [0], [0.5, 1], False, False, 1.0, None)
 
         results_list = []
         for i in range(results.shape[1]):
             img = results[0, i, :, :, :]
-            img = img.permute(1, 2, 0).cpu().numpy()
+            img = img.permute(1, 2, 0).float().cpu().numpy()
             img = (img * 255).clip(0, 255).astype("uint8")
             img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
             results_list.append(img)

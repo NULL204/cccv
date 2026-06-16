@@ -19,7 +19,8 @@ class CCBaseModel(BaseModelInterface):
 
     :param config: config of the model
     :param device: inference device
-    :param fp16: use fp16 precision or not
+    :param fp16: use fp16 (half) precision or not
+    :param bf16: use bf16 (bfloat16) precision or not, takes precedence over fp16; wider dynamic range than fp16 to avoid overflow/NaN on some models (e.g. transformer-based SR)
     :param compile: use torch.compile or not
     :param compile_backend: backend of torch.compile
     :param tile: tile size for tile inference, tile[0] is width, tile[1] is height, None for disable
@@ -34,6 +35,7 @@ class CCBaseModel(BaseModelInterface):
         config: Any,
         device: Optional[torch.device] = None,
         fp16: bool = True,
+        bf16: bool = False,
         compile: bool = False,
         compile_backend: Optional[str] = None,
         tile: Optional[Tuple[int, int]] = (128, 128),
@@ -53,6 +55,9 @@ class CCBaseModel(BaseModelInterface):
         self.config = config
         self.device: Optional[torch.device] = device
         self.fp16: bool = fp16
+        self.bf16: bool = bf16
+        # half precision dtype, bf16 takes precedence over fp16
+        self.half_dtype: torch.dtype = torch.bfloat16 if bf16 else torch.float16
         self.compile: bool = compile
         self.compile_backend: Optional[str] = compile_backend
         self.tile: Optional[Tuple[int, int]] = tile
@@ -69,13 +74,14 @@ class CCBaseModel(BaseModelInterface):
 
         self.model: torch.nn.Module = self.load_model()
 
-        # fp16
-        if self.fp16:
+        # half precision (fp16 or bf16, bf16 takes precedence)
+        if self.fp16 or self.bf16:
             try:
-                self.model = self.model.half()
+                self.model = self.model.to(self.half_dtype)
             except Exception as e:
-                warnings.warn(f"[CCCV] {e}. fp16 is not supported on this model, fallback to fp32.", stacklevel=2)
+                warnings.warn(f"[CCCV] {e}. half precision is not supported on this model, fallback to fp32.", stacklevel=2)
                 self.fp16 = False
+                self.bf16 = False
                 self.model = self.load_model()
 
         # compile

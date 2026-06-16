@@ -42,11 +42,12 @@ class SRBaseModel(CCBaseModel):
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         img = transforms.ToTensor()(img).unsqueeze(0).to(self.device)
-        if self.fp16:
-            img = img.half()
+        if self.fp16 or self.bf16:
+            img = img.to(self.half_dtype)
 
         img = self.inference(img)
-        img = img.squeeze(0).permute(1, 2, 0).cpu().numpy()
+        # cast back to float32 before numpy: numpy has no bfloat16 dtype
+        img = img.squeeze(0).permute(1, 2, 0).float().cpu().numpy()
         img = (img * 255).clip(0, 255).astype("uint8")
 
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
