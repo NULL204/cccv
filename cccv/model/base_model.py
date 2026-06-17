@@ -79,7 +79,9 @@ class CCBaseModel(BaseModelInterface):
             try:
                 self.model = self.model.to(self.half_dtype)
             except Exception as e:
-                warnings.warn(f"[CCCV] {e}. half precision is not supported on this model, fallback to fp32.", stacklevel=2)
+                warnings.warn(
+                    f"[CCCV] {e}. half precision is not supported on this model, fallback to fp32.", stacklevel=2
+                )
                 self.fp16 = False
                 self.bf16 = False
                 self.model = self.load_model()
