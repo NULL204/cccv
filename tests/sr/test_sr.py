@@ -46,6 +46,21 @@ def test_sr_fp16() -> None:
     assert compare_image_size(img1, img2, cfg.scale)
 
 
+def test_sr_bf16() -> None:
+    img1 = load_image()
+    k = ConfigType.RealESRGAN_AnimeJaNai_HD_V3_Compact_2x
+
+    cfg: BaseConfig = AutoConfig.from_pretrained(k)
+    model: SRBaseModel = AutoModel.from_config(config=cfg, device=CCCV_DEVICE, fp16=False, bf16=True, tile=CCCV_TILE)
+
+    img2 = model.inference_image(img1)
+
+    cv2.imwrite(str(ASSETS_PATH / f"test_bf16_{k}_out.jpg"), img2)
+
+    assert calculate_image_similarity(img1, img2)
+    assert compare_image_size(img1, img2, cfg.scale)
+
+
 @pytest.mark.skipif(
     sys.platform == "win32" or not torch_2_4, reason="Skip test torch.compile on Windows or PyTorch version is not 2.4"
 )
