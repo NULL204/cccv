@@ -46,6 +46,7 @@ def test_sr_fp16() -> None:
     assert compare_image_size(img1, img2, cfg.scale)
 
 
+@pytest.mark.skipif(not torch_2_4, reason="Skip test if PyTorch version is not 2.4")
 def test_sr_bf16() -> None:
     img1 = load_image()
     k = ConfigType.RealESRGAN_AnimeJaNai_HD_V3_Compact_2x
