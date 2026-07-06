@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, Dict, List, Optional, Tuple
 
 import cv2
 import numpy as np
@@ -14,6 +14,12 @@ from cccv.type import ModelType
 
 @MODEL_REGISTRY.register(name=ModelType.VSRBaseModel)
 class VSRBaseModel(CCBaseModel):
+    def get_bf16_preflight_inputs(self) -> Optional[Tuple[Tuple[Any, ...], Dict[str, Any]]]:
+        cfg: VSRBaseConfig = self.config
+        height, width = self._get_bf16_preflight_image_size()
+        imgs = torch.zeros((1, cfg.num_frame, 3, height, width), device=self.device, dtype=self.half_dtype)
+        return (imgs,), {}
+
     @torch.inference_mode()  # type: ignore
     def inference(self, img: torch.Tensor, *args: Any, **kwargs: Any) -> torch.Tensor:
         cfg: VSRBaseConfig = self.config

@@ -22,6 +22,8 @@ class AutoModel:
         tile: Optional[Tuple[int, int]] = (128, 128),
         tile_pad: int = 8,
         pad_img: Optional[Tuple[int, int]] = None,
+        bf16_preflight: bool = True,
+        bf16_preflight_size: Tuple[int, int] = (540, 960),
         model_dir: Optional[Union[Path, str]] = None,
         gh_proxy: Optional[str] = None,
         **kwargs: Any,
@@ -38,6 +40,8 @@ class AutoModel:
         :param tile: tile size for tile inference, tile[0] is width, tile[1] is height, None for disable
         :param tile_pad: The padding size for each tile
         :param pad_img: The size for the padded image, pad[0] is width, pad[1] is height, None for auto calculate
+        :param bf16_preflight: run a small bf16 inference before actual user inference, fallback if it fails
+        :param bf16_preflight_size: The bf16 preflight input size as (height, width), aligned per model if needed
         :param model_dir: The path to cache the downloaded model. Should be a full path. If None, use default cache path.
         :param gh_proxy: The proxy for downloading from github release. Example: https://github.abskoop.workers.dev/
         :return:
@@ -54,6 +58,8 @@ class AutoModel:
             tile=tile,
             tile_pad=tile_pad,
             pad_img=pad_img,
+            bf16_preflight=bf16_preflight,
+            bf16_preflight_size=bf16_preflight_size,
             model_dir=model_dir,
             gh_proxy=gh_proxy,
             **kwargs,
@@ -71,6 +77,8 @@ class AutoModel:
         tile: Optional[Tuple[int, int]] = (128, 128),
         tile_pad: int = 8,
         pad_img: Optional[Tuple[int, int]] = None,
+        bf16_preflight: bool = True,
+        bf16_preflight_size: Tuple[int, int] = (540, 960),
         model_dir: Optional[Union[Path, str]] = None,
         gh_proxy: Optional[str] = None,
         **kwargs: Any,
@@ -87,6 +95,8 @@ class AutoModel:
         :param tile: tile size for tile inference, tile[0] is width, tile[1] is height, None for disable
         :param tile_pad: The padding size for each tile
         :param pad_img: The size for the padded image, pad[0] is width, pad[1] is height, None for auto calculate
+        :param bf16_preflight: run a small bf16 inference before actual user inference, fallback if it fails
+        :param bf16_preflight_size: The bf16 preflight input size as (height, width), aligned per model if needed
         :param model_dir: The path to cache the downloaded model. Should be a full path. If None, use default cache path.
         :param gh_proxy: The proxy for downloading from github release. Example: https://github.abskoop.workers.dev/
         :return:
@@ -102,6 +112,8 @@ class AutoModel:
             tile=tile,
             tile_pad=tile_pad,
             pad_img=pad_img,
+            bf16_preflight=bf16_preflight,
+            bf16_preflight_size=bf16_preflight_size,
             model_dir=model_dir,
             gh_proxy=gh_proxy,
             **kwargs,

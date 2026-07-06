@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, Dict, List, Optional, Tuple
 
 import cv2
 import numpy as np
@@ -16,6 +16,11 @@ from cccv.util.misc import de_resize, resize
 class DRBAModel(VFIBaseModel):
     def post_init_hook(self) -> None:
         self.load_state_dict_strict = False
+
+    def get_bf16_preflight_inputs(self) -> Optional[Tuple[Tuple[Any, ...], Dict[str, Any]]]:
+        height, width = self._get_bf16_preflight_image_size(multiple=32)
+        imgs = torch.zeros((1, 3, 3, height, width), device=self.device, dtype=self.half_dtype)
+        return (imgs, [-1, -0.5], [0], [0.5, 1], False, False, 1.0, None), {}
 
     def transform_state_dict(self, state_dict: Any) -> Any:
         def _convert(param: Any) -> Any:
