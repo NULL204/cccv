@@ -140,8 +140,12 @@ class CCBaseModel(BaseModelInterface):
         self.bf16 = False
         self.half_dtype = torch.float16 if self.fp16 else torch.float32
         self.model = self.load_model()
+        if self.bf16 and torch.device(self.device).type == "cuda" and not torch.cuda.is_bf16_supported():
+            warnings.warn("[CCCV] bf16 is not supported on this CUDA device. Falling back to fp16.", stacklevel=2)
+            self.bf16 = False
+            self.half_dtype = torch.float16
 
-        if self.fp16:
+        if self.fp16 or self.bf16:
             try:
                 self.model = self.model.to(self.half_dtype)
             except Exception as e:
