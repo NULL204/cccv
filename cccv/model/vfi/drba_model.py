@@ -99,7 +99,7 @@ class DRBAModel(VFIBaseModel):
         results_list = []
         for i in range(results.shape[1]):
             img = results[0, i, :, :, :]
-            img = img.permute(1, 2, 0).float().cpu().numpy()
+            img = self._tensor_to_numpy(img.permute(1, 2, 0))
             img = (img * 255).clip(0, 255).astype("uint8")
             img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
             results_list.append(img)

@@ -64,7 +64,7 @@ class VSRBaseModel(CCBaseModel):
 
             for i in range(out.shape[1]):
                 img = out[0, i, :, :, :]
-                img = img.permute(1, 2, 0).float().cpu().numpy()
+                img = self._tensor_to_numpy(img.permute(1, 2, 0))
                 img = (img * 255).clip(0, 255).astype("uint8")
                 img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
                 res_img_list.append(img)
@@ -72,7 +72,7 @@ class VSRBaseModel(CCBaseModel):
             return res_img_list
 
         elif len(out.shape) == 4:
-            img = out.squeeze(0).permute(1, 2, 0).float().cpu().numpy()
+            img = self._tensor_to_numpy(out.squeeze(0).permute(1, 2, 0))
             img = (img * 255).clip(0, 255).astype("uint8")
             img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
 

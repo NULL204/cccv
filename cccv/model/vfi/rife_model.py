@@ -81,7 +81,7 @@ class RIFEModel(VFIBaseModel):
         # Convert to numpy image list
         results_list = []
 
-        img = out.squeeze(0).permute(1, 2, 0).float().cpu().numpy()
+        img = self._tensor_to_numpy(out.squeeze(0).permute(1, 2, 0))
         img = (img * 255).clip(0, 255).astype("uint8")
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
 

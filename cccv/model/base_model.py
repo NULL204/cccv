@@ -97,9 +97,24 @@ class CCBaseModel(BaseModelInterface):
         try:
             self.model = self.model.to(self.half_dtype)
         except Exception as e:
+            if self.bf16 and self.fp16:
+                warnings.warn(f"[CCCV] {e}. bf16 is not supported on this model, fallback to fp16.", stacklevel=2)
+                self.bf16 = False
+                self.half_dtype = torch.float16
+                self.model = self.load_model()
+                try:
+                    self.model = self.model.to(self.half_dtype)
+                    return
+                except Exception as fp16_error:
+                    warnings.warn(f"[CCCV] {fp16_error}. fp16 fallback failed, fallback to fp32.", stacklevel=2)
+                    self.fp16 = False
+                    self.half_dtype = torch.float32
+                    self.model = self.load_model()
+                    return
+
             warnings.warn(f"[CCCV] {e}. half precision is not supported on this model, fallback to fp32.", stacklevel=2)
-            self.fp16 = False
             self.bf16 = False
+            self.fp16 = False
             self.half_dtype = torch.float32
             self.model = self.load_model()
 
@@ -164,6 +179,13 @@ class CCBaseModel(BaseModelInterface):
     def _empty_device_cache(self) -> None:
         if self.device is not None and torch.device(self.device).type == "cuda" and torch.cuda.is_available():
             torch.cuda.empty_cache()
+
+    @staticmethod
+    def _tensor_to_numpy(tensor: torch.Tensor) -> Any:
+        tensor = tensor.cpu()
+        if tensor.dtype == torch.bfloat16:
+            tensor = tensor.float()
+        return tensor.numpy()
 
     def get_bf16_preflight_inputs(self) -> Optional[Tuple[Tuple[Any, ...], Dict[str, Any]]]:
         """

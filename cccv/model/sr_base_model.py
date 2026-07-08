@@ -51,8 +51,7 @@ class SRBaseModel(CCBaseModel):
             img = img.to(self.half_dtype)
 
         img = self.inference(img)
-        # cast back to float32 before numpy: numpy has no bfloat16 dtype
-        img = img.squeeze(0).permute(1, 2, 0).float().cpu().numpy()
+        img = self._tensor_to_numpy(img.squeeze(0).permute(1, 2, 0))
         img = (img * 255).clip(0, 255).astype("uint8")
 
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
