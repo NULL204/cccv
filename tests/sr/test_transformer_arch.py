@@ -47,6 +47,16 @@ def test_dat_attention_mask_matches_bf16_dtype() -> None:
     _assert_bf16_attention_forward(forward)
 
 
+def test_dat_relative_position_bias_matches_bf16_dtype() -> None:
+    def forward() -> torch.Tensor:
+        attn = Spatial_Attention(dim=8, idx=0, split_size=[4, 4], num_heads=2).eval()
+        qkv = torch.randn((3, 1, 16, 8), dtype=torch.bfloat16)
+        with torch.inference_mode():
+            return attn(qkv, 4, 4)
+
+    _assert_bf16_attention_forward(forward)
+
+
 def test_hat_attention_mask_matches_bf16_dtype() -> None:
     def forward() -> torch.Tensor:
         attn = HATWindowAttention(dim=8, window_size=(4, 4), num_heads=2).to(torch.bfloat16).eval()

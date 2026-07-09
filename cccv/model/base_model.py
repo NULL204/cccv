@@ -44,7 +44,7 @@ class CCBaseModel(BaseModelInterface):
         tile_pad: int = 8,
         pad_img: Optional[Tuple[int, int]] = None,
         bf16_preflight: bool = True,
-        bf16_preflight_size: Tuple[int, int] = (540, 960),
+        bf16_preflight_size: Tuple[int, int] = (64, 64),
         model_dir: Optional[Union[Path, str]] = None,
         gh_proxy: Optional[str] = None,
         **kwargs: Any,
@@ -155,10 +155,6 @@ class CCBaseModel(BaseModelInterface):
         self.bf16 = False
         self.half_dtype = torch.float16 if self.fp16 else torch.float32
         self.model = self.load_model()
-        if self.bf16 and torch.device(self.device).type == "cuda" and not torch.cuda.is_bf16_supported():
-            warnings.warn("[CCCV] bf16 is not supported on this CUDA device. Falling back to fp16.", stacklevel=2)
-            self.bf16 = False
-            self.half_dtype = torch.float16
 
         if self.fp16 or self.bf16:
             try:
